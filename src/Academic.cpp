@@ -4,4 +4,6 @@
 Academic::Academic():User("academic") {}
 
 
-void Academic::reg_user(){}
+bool Academic::save_db(string table, string datas[]) {
+	return DatabaseHelper::save_user("academic", datas);
+}

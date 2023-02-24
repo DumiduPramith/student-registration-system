@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\DatabaseHelper.cpp" />
     <ClCompile Include="src\Academic.cpp" />
     <ClCompile Include="src\Admin.cpp" />
     <ClCompile Include="src\Database.cpp" />
@@ -169,6 +170,7 @@
     <ClCompile Include="src\User.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\student-registration-system\DatabaseHelper.h" />
     <ClInclude Include="include\student-registration-system\Academic.h" />
     <ClInclude Include="include\student-registration-system\Admin.h" />
     <ClInclude Include="include\student-registration-system\Database.h" />

@@ -71,7 +71,6 @@ void TableCreate::create_student_course() {
 
 void TableCreate::run() {
 	int exit;
-	sqlite3_stmt* stmt;
 	const char* query = "SELECT name FROM sqlite_master WHERE type='table' AND name=?;";
 	sqlite3_prepare_v2(db, query, -1, &stmt, NULL);
 
@@ -101,6 +100,5 @@ void TableCreate::run() {
 	}
 
 	sqlite3_finalize(stmt);
-	sqlite3_close(db);
 }
 

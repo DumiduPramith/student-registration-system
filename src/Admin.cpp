@@ -3,4 +3,8 @@
 Admin::Admin() :User("admin") { cout << "test" << endl; }
 
 void Admin::create_cource(){}
-void Admin::reg_user(){}
+
+bool Admin::save_db(string table, string datas[]) {
+	return DatabaseHelper::save_user("admin", datas);
+}
+

@@ -4,11 +4,14 @@ class Admin :
     public User
 {
 private:
+
+protected:
+    int admin_id;
+
 public:
     Admin();
 
     void create_cource();
-    void reg_user();
-protected:
-    int admin_id;
+
+    bool save_db(string table, string datas[]);
 };

@@ -13,7 +13,6 @@ public:
 	Academic();
 	static void login();
 
-
-	static void reg_user();
+	bool save_db(string table, string datas[]);
 };
 

@@ -6,6 +6,8 @@
 class Student :
 	public User
 {
+
+protected:
 	int student_id;
 	string cources;
 
@@ -14,7 +16,8 @@ public:
 	void view_cources();
 	void register_cource();
 
-	int save_file();
-	static void reg_user();
+	bool save_db(string datas[]) override;
+
+	bool user_exists(string name) override;
 };
 

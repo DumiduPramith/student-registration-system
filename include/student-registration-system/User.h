@@ -1,10 +1,11 @@
 #pragma once
 #include<iostream>
 #include<string>
+#include "DatabaseHelper.h"
 
 using namespace std;
 
-class User
+class User: public DatabaseHelper
 {
 protected:
     string username;
@@ -22,6 +23,7 @@ public:
     void set_password(string pword);
     void set_email(string mail);
     bool login();
-    virtual int save_file() = 0;
+    virtual bool save_db(string datas[]) = 0;
+    virtual bool user_exists(string name) = 0;
 };
 

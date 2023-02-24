@@ -3,11 +3,14 @@
 class Management :
     public User
 {
+private:
+
 protected:
     int management_id;
-private:
+
 public:
     Management();
     void view_registered_student();
-    void reg_user();
+    
+    bool save_db(string table, string datas[]);
 };

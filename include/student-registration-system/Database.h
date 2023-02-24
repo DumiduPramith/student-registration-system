@@ -11,10 +11,12 @@ private:
 	
 	int exit;
 	char* error_msg;
+	static bool initialized;
 public:
 	Database();
-	~Database();
 	
+	void close_connection();
+
 	int createTable(std::string query);
 	int insertData(std::string query);
 	int select_data(std::string query);
@@ -23,6 +25,7 @@ public:
 
 protected:
 	static sqlite3* db;
+	static sqlite3_stmt* stmt;
 	static std::vector<std::vector<char*>*> data_lst;
 	static int callback(void* NotUsed, int argc, char** argv, char** azColName);
 };

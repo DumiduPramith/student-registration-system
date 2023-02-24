@@ -12,18 +12,27 @@ using namespace std;
 std::vector<std::vector<char*>*> Database::data_lst;
 
 sqlite3* Database::db;
+sqlite3_stmt* Database::stmt;
+
+bool Database::initialized = false;
+
 
 Database::Database() {
-	exit = sqlite3_open("test.db",&db);
-	if (exit) {
-		cout << "Cannot open database" << endl;
-	}
-	else {
-		cout << "Database open success" << endl;
+	if (!initialized) {
+		exit = sqlite3_open("test.db",&db);
+		if (exit) {
+			cout << "Cannot open database" << endl;
+		}
+		else {
+			cout << "Database open success" << endl;
+		}
+		initialized = true;
 	}
 }
 
-Database::~Database() {
+
+void Database::close_connection() {
+	cout << "connection closed" << endl;
 	sqlite3_close(db);
 	sqlite3_free(error_msg);
 }

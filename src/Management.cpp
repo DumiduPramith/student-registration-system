@@ -4,4 +4,6 @@ Management::Management():User("management") {}
 
 void Management::view_registered_student(){}
 
-void Management::reg_user(){}
+bool Management::save_db(string table, string datas[]) {
+	return DatabaseHelper::save_user("management", datas);
+}
