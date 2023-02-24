@@ -32,3 +32,4 @@
 *.app
 /.vs/student-registration-system
 /bin
+*.db
