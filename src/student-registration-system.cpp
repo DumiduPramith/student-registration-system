@@ -10,22 +10,29 @@
 
 using namespace std;
 
-
 int main()
 {
+
     crow::SimpleApp app;
     TableCreate tbl;
     //tbl.run();
     
-    CROW_ROUTE(app, "/hello")
-        ([]() {
-        return "Hello world!";
-            });
 
     CROW_ROUTE(app, "/api/register").methods(crow::HTTPMethod::POST)([](const crow::request& req) {
+        
         auto body = crow::json::load(req.body);
+        crow::response res;
+        res.set_header("Cache-Control", "no-cache");
+        res.set_header("Access-Control-Allow-Origin", "*");
+        res.set_header("Access-Control-Allow-Headers", "application/json");
+        res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        
         if (!body) {
-            return crow::response(400, "Invalid body");
+            res.code = 400;
+            res.body = "Invalid body";
+            res.end();
+            return res;
+            
         }
         string role,username, email, password;
         try {
@@ -34,14 +41,19 @@ int main()
             email = body["email"].s();
             password = body["password"].s();
         }catch(const runtime_error &err){
-            return crow::response(400, "Invalid body");
+            res.code = 400;
+            res.body = "Invalid body";
+            return res;
         }
         switch (stoi(role)) {
         case 1:
         {
             Student student;
             if (student.user_exists(username)) {
-                return crow::response(409, "User already exist");
+                res.code = 409;
+                res.body = "User already exist";
+                return res;
+                
             }
             string datas[] = { username, email, password };
             student.save_db(datas);
@@ -51,7 +63,9 @@ int main()
         {
             Academic academic;
             if (academic.user_exists(username)) {
-                return crow::response(409, "User already exist");
+                res.code = 409;
+                res.body = "User already exist";
+                return res;                
             }
             string datas[] = { username, email, password };
             academic.save_db(datas);
@@ -61,7 +75,9 @@ int main()
         {
             Management management;
             if (management.user_exists(username)) {
-                return crow::response(409, "User already exist");
+                res.code = 409;
+                res.body = "User already exist";
+                return res;
             }
             string datas[] = { username, email, password };
             management.save_db(datas);
@@ -71,14 +87,18 @@ int main()
         {
             Admin admin;
             if (admin.user_exists(username)) {
-                return crow::response(409, "User already exist");
+                res.code = 409;
+                res.body = "User already exist";
+                return res;
             }
             string datas[] = { username, email, password };
             admin.save_db(datas);
             break;
         }
         }
-        return crow::response(201, "success");
+        res.code = 201;
+        res.body = "success";
+        return res;
         });
 
     CROW_ROUTE(app, "/api/login").methods(crow::HTTPMethod::POST)([](const crow::request& req) {
@@ -175,6 +195,7 @@ int main()
 
         });
 
+  
 
     CROW_ROUTE(app, "/api/get/reg-students")([]() {
         Academic academic;
@@ -191,7 +212,12 @@ int main()
                 });
         }
         academic.clear_data_lst();
-        return crow::json::wvalue{ { "data", students } };
+        crow::json::wvalue data{ {"data", students}};
+        crow::response res(200, data);
+        res.set_header("Content-Type", "application/json");
+        res.set_header("Cache-Control", "no-cache");
+        res.set_header("Access-Control-Allow-Origin", "*");
+        return res;
         });
 
     CROW_ROUTE(app, "/api/get/courses")([]() {
@@ -207,11 +233,16 @@ int main()
                 {"course_id", courseId},
                 {"course_code", courseCode},
                 {"course_title", courseTitle},
-                {"course_descrition", courseDescription}
+                {"course_description", courseDescription}
                 });
         }
         admin.clear_data_lst();
-        return crow::json::wvalue{ { "data", cources } };
+        crow::json::wvalue data{ {"data", cources} };
+        crow::response res(200, data);
+        res.set_header("Content-Type", "application/json");
+        res.set_header("Cache-Control", "no-cache");
+        res.set_header("Access-Control-Allow-Origin", "*");
+        return res;
         });
 
 
