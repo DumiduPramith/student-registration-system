@@ -13,11 +13,14 @@ protected:
 
 public:
 	Student();
+
 	void view_cources();
 	void register_cource();
 
 	bool save_db(string datas[]) override;
 
 	bool user_exists(string name) override;
+
+	bool get_cources();
 };
 

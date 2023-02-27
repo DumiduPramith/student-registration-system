@@ -13,5 +13,9 @@ public:
 
     void create_cource();
 
-    bool save_db(string table, string datas[]);
+    bool save_db(string datas[]) override;
+
+    bool user_exists(string name) override;
+
+    bool get_all_cources();
 };

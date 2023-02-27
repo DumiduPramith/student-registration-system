@@ -64,13 +64,6 @@ int Database::insertData(string query){
 
 int Database::select_data(string query){
 	sqlite3_exec(db, query.c_str(), callback, NULL, NULL);
-	/*clear_data_lst();
-	for (int i = 0; i < data_lst.size(); i++) {
-		for (int j = 0; j < data_lst[i]->size(); j++) {
-			
-			cout << data_lst[i]->at(j) << endl;
-		}
-	}*/
 	return 0;
 }
 
@@ -90,13 +83,13 @@ int Database::callback(void* NotUsed, int argc, char** argv, char** azColName) {
 
 
 void Database::clear_data_lst() {
-	for (int i = 0; i < static_cast<int>(data_lst.size()); i++) {
-		for (int j = 0; j < static_cast<int>(data_lst[i]->size()); j++) {
-			char* ptr = data_lst[i]->at(j);
-			delete[] ptr;
+	for (auto vec : data_lst) {
+		for (auto str : *vec) {
+			delete[] str; // free the memory occupied by each char*
 		}
-		data_lst.clear();
+		delete vec; // free the memory occupied by each vector<char*>*
 	}
+	data_lst.clear(); // remove all elements from the vector
 }
 
 std::string Database::gen_hashed_pword(std::string pword) {

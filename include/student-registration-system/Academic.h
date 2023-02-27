@@ -11,8 +11,11 @@ protected:
 	int academic_id;
 public:
 	Academic();
-	static void login();
 
-	bool save_db(string table, string datas[]);
+	bool save_db(string datas[]) override;
+
+	bool user_exists(string name) override;
+
+	bool view_reg_students();
 };
 

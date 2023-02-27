@@ -42,6 +42,9 @@
     <ClCompile Include="src\DatabaseHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Course.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\student-registration-system\Academic.h">
@@ -69,6 +72,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\student-registration-system\DatabaseHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\student-registration-system\Course.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
