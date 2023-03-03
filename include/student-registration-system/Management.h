@@ -15,4 +15,6 @@ public:
     bool save_db(string datas[]) override;
 
     bool user_exists(string name) override;
+
+    int get_userId();
 };

@@ -17,5 +17,7 @@ public:
 	bool user_exists(string name) override;
 
 	bool view_reg_students();
+
+	int get_userId();
 };
 

@@ -18,4 +18,6 @@ public:
     bool user_exists(string name) override;
 
     bool get_all_cources();
+
+    int get_userId();
 };

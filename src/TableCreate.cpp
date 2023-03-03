@@ -68,6 +68,13 @@ void TableCreate::create_student_course() {
 	createTable(sql);
 }
 
+void TableCreate::create_default_admin() {
+	std::string password = "admin";
+	std::string hashed_password = Database::gen_hashed_pword(password);
+	std::string sql = "INSERT INTO admin(username,email,password) values "
+		"(\"admin\",\"admin@example.com\",\"" + hashed_password + "\")";
+	Database::insertData(sql);
+}
 
 void TableCreate::run() {
 	int exit;
@@ -82,6 +89,7 @@ void TableCreate::run() {
 			}
 			else if (table_lst[i] == "admin") {
 				create_admin();
+				create_default_admin();
 			}
 			else if (table_lst[i] == "management") {
 				create_management();

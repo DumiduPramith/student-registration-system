@@ -30,7 +30,6 @@ Database::Database() {
 	}
 }
 
-
 void Database::close_connection() {
 	cout << "connection closed" << endl;
 	sqlite3_close(db);
@@ -80,7 +79,6 @@ int Database::callback(void* NotUsed, int argc, char** argv, char** azColName) {
 
 	return 0;
 }
-
 
 void Database::clear_data_lst() {
 	for (auto vec : data_lst) {

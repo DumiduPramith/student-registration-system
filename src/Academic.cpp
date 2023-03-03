@@ -16,3 +16,7 @@ bool Academic::view_reg_students() {
 	Database::select_data(sql);
 	return true;
 }
+
+int Academic::get_userId() {
+	return 0;
+}

@@ -11,3 +11,7 @@ bool Management::save_db(string datas[]) {
 bool Management::user_exists(string name) {
 	return DatabaseHelper::find_user_exist(role, name);
 }
+
+int Management::get_userId() {
+	return 0;
+}

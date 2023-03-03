@@ -17,3 +17,7 @@ bool Admin::get_all_cources() {
 	Database::select_data(sql);
 	return true;
 }
+
+int Admin::get_userId() {
+	return 0;
+}

@@ -18,6 +18,8 @@ public:
     void create_course();
     void create_student_course();
 
+    void create_default_admin();
+
     void run();
 };
 

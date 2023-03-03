@@ -6,31 +6,64 @@
 #include "Academic.h"
 #include "Course.h"
 #include "crow.h"
+#include "nlohmann/json.hpp"
 #include <vector>
+#include <fstream>
+
 
 using namespace std;
+using json = nlohmann::json;
+
+void sendSuccessResponse(crow::response& res, int res_code, string data) {
+    json myJson = {
+        {"success", true},
+        {"data", data}
+    };
+
+    std::string jsonString = myJson.dump();
+
+    res.set_header("Content-Type", "application/json");
+    res.set_header("Cache-Control", "no-cache");
+    res.set_header("Access-Control-Allow-Origin", "*");
+    res.set_header("Access-Control-Allow-Headers", "Content-Type");
+    res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.code = res_code;
+    res.write(jsonString);
+    //res.end();
+}
+
+void sendErrorResponse(crow::response& res, int res_code, string data) {
+    json myJson = {
+        {"success", false},
+        {"data", data}
+    };
+
+    std::string jsonString = myJson.dump();
+
+    res.set_header("Content-Type", "application/json");
+    res.set_header("Cache-Control", "no-cache");
+    res.set_header("Access-Control-Allow-Origin", "*");
+    res.set_header("Access-Control-Allow-Headers", "Content-Type");
+    res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.code = res_code;
+    res.write(jsonString);
+    //res.end();
+}
 
 int main()
 {
 
     crow::SimpleApp app;
     TableCreate tbl;
-    //tbl.run();
-    
+    tbl.run();
+
 
     CROW_ROUTE(app, "/api/register").methods(crow::HTTPMethod::POST)([](const crow::request& req) {
-        
         auto body = crow::json::load(req.body);
         crow::response res;
-        res.set_header("Cache-Control", "no-cache");
-        res.set_header("Access-Control-Allow-Origin", "*");
-        res.set_header("Access-Control-Allow-Headers", "application/json");
-        res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         
-        if (!body) {
-            res.code = 400;
-            res.body = "Invalid body";
-            res.end();
+       if (!body) {
+            sendErrorResponse(res, 400, "Invalid body");
             return res;
             
         }
@@ -41,8 +74,7 @@ int main()
             email = body["email"].s();
             password = body["password"].s();
         }catch(const runtime_error &err){
-            res.code = 400;
-            res.body = "Invalid body";
+            sendErrorResponse(res, 400, "Invalid body");
             return res;
         }
         switch (stoi(role)) {
@@ -50,8 +82,7 @@ int main()
         {
             Student student;
             if (student.user_exists(username)) {
-                res.code = 409;
-                res.body = "User already exist";
+                sendErrorResponse(res, 409, "User already exist");
                 return res;
                 
             }
@@ -63,8 +94,7 @@ int main()
         {
             Academic academic;
             if (academic.user_exists(username)) {
-                res.code = 409;
-                res.body = "User already exist";
+                sendErrorResponse(res, 409, "User already exist");
                 return res;                
             }
             string datas[] = { username, email, password };
@@ -75,8 +105,7 @@ int main()
         {
             Management management;
             if (management.user_exists(username)) {
-                res.code = 409;
-                res.body = "User already exist";
+                sendErrorResponse(res, 409, "User already exist");
                 return res;
             }
             string datas[] = { username, email, password };
@@ -87,8 +116,7 @@ int main()
         {
             Admin admin;
             if (admin.user_exists(username)) {
-                res.code = 409;
-                res.body = "User already exist";
+                sendErrorResponse(res, 409, "User already exist");
                 return res;
             }
             string datas[] = { username, email, password };
@@ -96,19 +124,22 @@ int main()
             break;
         }
         }
-        res.code = 201;
-        res.body = "success";
+
+        sendSuccessResponse(res, 201, "success");
         return res;
         });
 
     CROW_ROUTE(app, "/api/login").methods(crow::HTTPMethod::POST)([](const crow::request& req) {
         bool is_success = false;
+        crow::response res;
         auto body = crow::json::load(req.body);
         if (!body) {
-            return crow::response(400, "Invalid body");
+            sendErrorResponse(res, 400, "Invalid Body");
+            
         }
         int role;
         string username, password;
+        int userId;
         try {
             role = body["role"].i();
             username = body["username"].s();       
@@ -119,83 +150,135 @@ int main()
                 Student student;
                 student.set_username(username);
                 is_success = student.login(password);
+                if (is_success) {
+                    userId = student.get_userId();
+                }
                 break;
             }
             case 2:
             {
                 Academic academic;
+                academic.set_username(username);
                 is_success = academic.login(password);
+                if (is_success) {
+                    userId = academic.get_userId();
+                }
                 break;
             }
             case 3:
             {
                 Management management;
+                management.set_username(username);
                 is_success = management.login(password);
+                if (is_success) {
+                    userId = management.get_userId();
+                }
                 break;
             }
             case 4:
             {
                 Admin admin;
+                admin.set_username(username);
                 is_success = admin.login(password);
+                if (is_success) {
+                    userId = admin.get_userId();
+                }
                 break;
             }
             }
         }
         catch (const runtime_error& err) {
-            return crow::response(400, "Invalid body");
+            sendErrorResponse(res, 400, "Invalid body");
+            return res;
         }
         if (is_success) {
-            return crow::response(200, "success");
+            json myJson = {
+                {"userId" , userId},
+                {"msg","Success"}
+            };
+            string jsonString = myJson.dump();
+            sendSuccessResponse(res, 200, jsonString);
+            return res;
         }
         else {
-            return crow::response(401, "failed");
+            sendErrorResponse(res, 401, "password not matched");
+            return res;
         }
         });
 
     CROW_ROUTE(app, "/api/create-course").methods(crow::HTTPMethod::POST)([](const crow::request& req) {
         auto body = crow::json::load(req.body);
+        crow::response res;
         if (!body) {
-            return crow::response(400, "Invalid body");
+            sendErrorResponse(res, 400, "Invalid Body");
+            return res;
         }
         string course_code,course_name,course_description;
         try {
-            course_code = body["course-code"].s();
-            course_name = body["course-name"].s();
-            course_description = body["course-description"].s();
+            course_code = body["course_code"].s();
+            course_name = body["course_name"].s();
+            course_description = body["course_description"].s();
         }
         catch (const runtime_error& err) {
-            return crow::response(400, "Invalid body");
+            sendErrorResponse(res, 400, "Invalid Body");
+            return res;
         }
         Course course;
         course.course_code = course_code;
         course.course_name = course_name;
         course.course_description = course_description;
         course.create_course();
-        return crow::response(201, "success");
+        sendSuccessResponse(res, 201, "Suceess");
+        return res;
         });
     
     CROW_ROUTE(app, "/api/register-course").methods(crow::HTTPMethod::POST)([](const crow::request& req) {
         auto body = crow::json::load(req.body);
+        crow::response res;
         if (!body) {
-            return crow::response(400, "Invalid body");
+            sendErrorResponse(res, 400, "Invalid body");
+            return res;
         }
         int userId;
         try {
-            userId = body["user-id"].i();
+            userId = body["user_id"].i();
             auto courses = body["courses"];
-            Course course;
+            Student student;
             for (auto courseId : courses) {
-                course.register_course(userId, courseId.i());
+                student.register_course(userId, courseId.i());
             }
         }
         catch (const runtime_error& err) {
-            return crow::response(400, "Invalid body");
+            sendErrorResponse(res, 400, "Invalid body");
+            return res;
         }
-        return crow::response(201, "success");
-
+        sendSuccessResponse(res, 201, "success");
+        return res;
         });
-
   
+    CROW_ROUTE(app, "/api/remove-register-course").methods(crow::HTTPMethod::POST)([](const crow::request& req) {
+        auto body = crow::json::load(req.body);
+        crow::response res;
+        if (!body) {
+            sendErrorResponse(res, 400, "Invalid body");
+            return res;
+        }
+        int userId;
+        try {
+            userId = body["user_id"].i();
+            auto courses = body["courses"];
+            Student student;
+            for (auto courseId : courses) {
+                student.remove_registered_cources(userId, courseId.i());
+            }
+        }
+        catch (const runtime_error& err) {
+            sendErrorResponse(res, 400, "Invalid body");
+            return res;
+        }
+        sendSuccessResponse(res, 201, "success");
+        return res;
+        });
 
     CROW_ROUTE(app, "/api/get/reg-students")([]() {
         Academic academic;
@@ -237,6 +320,37 @@ int main()
                 });
         }
         admin.clear_data_lst();
+        crow::json::wvalue data{ {"data", cources} };
+        crow::response res(200, data);
+        res.set_header("Content-Type", "application/json");
+        res.set_header("Cache-Control", "no-cache");
+        res.set_header("Access-Control-Allow-Origin", "*");
+        return res;
+        });
+
+    CROW_ROUTE(app, "/api/get/selected-courses")([](const crow::request& req) {
+        Student student;
+        try {
+            auto username = req.url_params.get("username");
+            string tmp(username);
+            student.set_username(tmp);
+            student.get_registered_cources();
+        }
+        catch (const runtime_error& err) {}
+        std::vector<crow::json::wvalue> cources;
+        for (auto row : student.data_lst) {
+            auto courseId = row->at(0);
+            auto courseCode = row->at(1);
+            auto courseTitle = row->at(2);
+            auto courseDescription = row->at(3);
+            cources.push_back(crow::json::wvalue{
+                {"course_id", courseId},
+                {"course_code", courseCode},
+                {"course_title", courseTitle},
+                {"course_description", courseDescription}
+                });
+        }
+        student.clear_data_lst();
         crow::json::wvalue data{ {"data", cources} };
         crow::response res(200, data);
         res.set_header("Content-Type", "application/json");

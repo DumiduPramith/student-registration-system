@@ -14,7 +14,8 @@ protected:
 public:
 	Student();
 
-	void view_cources();
+	bool get_registered_cources();
+
 	void register_cource();
 
 	bool save_db(string datas[]) override;
@@ -22,5 +23,9 @@ public:
 	bool user_exists(string name) override;
 
 	bool get_cources();
+
+	int get_userId();
+
+	bool remove_registered_cources(int userId, int courseId);
 };
 
