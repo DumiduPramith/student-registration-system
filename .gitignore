@@ -33,3 +33,4 @@
 /.vs/student-registration-system
 /bin
 *.db
+/dist

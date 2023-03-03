@@ -7,9 +7,9 @@
 #include "Course.h"
 #include "crow.h"
 #include "nlohmann/json.hpp"
+#include <boost/algorithm/string.hpp>
 #include <vector>
 #include <fstream>
-
 
 using namespace std;
 using json = nlohmann::json;
@@ -56,6 +56,8 @@ int main()
     crow::SimpleApp app;
     TableCreate tbl;
     tbl.run();
+
+    crow::mustache::set_global_base("public");
 
 
     CROW_ROUTE(app, "/api/register").methods(crow::HTTPMethod::POST)([](const crow::request& req) {
@@ -359,6 +361,50 @@ int main()
         return res;
         });
 
+
+    CROW_ROUTE(app, "/<path>")([](const crow::request& req, const std::string& path) {
+        cout << "hit" << endl;
+        bool is_static = false;
+        string folder = "dist/";
+        crow::response res;
+        std::vector<std::string> tokens;
+        boost::split(tokens, path, boost::is_any_of("."));
+
+        for (const auto& t : tokens) {
+            if (t == "js") {
+                is_static = true;
+                res.set_header("Content-Type", "application/x-javascript; charset=utf-8");
+            }
+            else if (t == "css") {
+                is_static = true;
+                res.set_header("Content-Type", "text/css");
+            }
+        }
+        if (is_static) {
+            std::ifstream file(folder + path, std::ios::binary);
+
+            if (!file.is_open()) {
+                res.code = 404;
+                res.body = "File not found";
+                return res;
+            }
+            std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+            res.body = content;
+            return res;
+        }
+        std::ifstream file(folder+"index.html", std::ios::binary);
+
+        if (!file.is_open()) {
+            res.code = 404;
+            res.body = "File not found";
+            return res;
+        }
+        std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        res.body = content;
+        res.set_header("Content-Type", "text/html");
+        return res;
+
+        });
 
     app.port(8080).run();
     tbl.close_connection();
