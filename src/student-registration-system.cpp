@@ -365,7 +365,7 @@ int main()
     CROW_ROUTE(app, "/<path>")([](const crow::request& req, const std::string& path) {
         cout << "hit" << endl;
         bool is_static = false;
-        string folder = "dist/";
+        string folder = "dist/student-registration/";
         crow::response res;
         std::vector<std::string> tokens;
         boost::split(tokens, path, boost::is_any_of("."));
@@ -404,6 +404,24 @@ int main()
         res.set_header("Content-Type", "text/html");
         return res;
 
+        });
+
+
+    CROW_ROUTE(app, "/")([](const crow::request& req) {
+        string folder = "dist/student-registration/";
+        crow::response res;
+
+        std::ifstream file(folder + "index.html", std::ios::binary);
+
+        if (!file.is_open()) {
+            res.code = 404;
+            res.body = "File not found";
+            return res;
+        }
+        std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        res.body = content;
+        res.set_header("Content-Type", "text/html");
+        return res;
         });
 
     app.port(8080).run();
