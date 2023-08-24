@@ -363,6 +363,7 @@ int main()
 
 
     CROW_ROUTE(app, "/<path>")([](const crow::request& req, const std::string& path) {
+        // handle static files
         cout << "hit" << endl;
         bool is_static = false;
         string folder = "dist/student-registration/";
@@ -424,6 +425,11 @@ int main()
         return res;
         });
 
+
+    cout << "http://127.0.0.1:8080" << endl;
+
+
     app.port(8080).run();
+
     tbl.close_connection();
 }

@@ -19,7 +19,7 @@ bool Database::initialized = false;
 
 Database::Database() {
 	if (!initialized) {
-		exit = sqlite3_open("test.db",&db);
+		exit = sqlite3_open("student_registration.db",&db);
 		if (exit) {
 			cout << "Cannot open database" << endl;
 		}
